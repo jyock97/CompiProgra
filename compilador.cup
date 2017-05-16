@@ -1,0 +1,57 @@
+package proyectocompi;
+import java_cup.runtime.*;
+
+terminal            ADD, MINUS, TIMES, DIV, LPAREN, RPAREN, SEMICOLON, EQUALS, LLLAVE, RLLAVE, AND, OR, DIF, MENOR, MAYOR;
+terminal            MAIN, IF, WHILE, ELSE, PUTW, PUTS, INT, BREAK;
+terminal Integer    INTEGER;
+terminal Boolean    BOOLEAN;
+terminal String     ID;
+
+
+non terminal        lstExpr, expr;
+
+precedence left ADD, MINUS;
+precedence left TIMES, DIV;
+precedence left EQUALS, MAYOR, MENOR, AND, OR, DIF;
+
+lstExpr ::=     expr:e SEMICOLON  
+                                {: System.out.println("punto y coma"); :}
+                |SEMICOLON  
+                                {:  :}
+                ;
+
+expr    ::=     expr:e1 ADD expr:e2 
+                                {: System.out.println("suma"); :}
+                | expr:e1 MINUS expr:e2 
+                                {: System.out.println("resta"); :}
+                | expr:e1 TIMES expr:e2 
+                                {: System.out.println("multiplicacion"); :}
+                | expr:e1 DIV expr:e2 
+                                {: System.out.println("division"); :}
+                | LPAREN expr:e RPAREN
+                                 {: System.out.println("parentesis"); :}
+                | expr:e1 EQUALS expr:e2 
+                                {: System.out.println("igual"); :}
+                | LLLAVE expr:e RLLAVE
+                                 {: System.out.println("llave"); :}
+                | expr:e1 MAYOR expr:e2 
+                                {: System.out.println("mayor"); :}
+                | expr:e1 MENOR expr:e2 
+                                {: System.out.println("menor"); :}
+                | expr:e1 AND expr:e2 
+                                {: System.out.println("and"); :}
+                | expr:e1 OR expr:e2 
+                                {: System.out.println("or"); :}
+                | expr:e1 DIF expr:e2 
+                                {: System.out.println("diferente"); :}
+                |
+                ID:Id
+                                {: System.out.println("id"); :}
+                |
+                INTEGER:n   
+                                {: System.out.println("num"); :}
+                |
+                BOOLEAN:b  
+                                {: System.out.println("boolean"); :}
+              
+                ;
