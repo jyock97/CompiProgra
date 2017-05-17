@@ -24,8 +24,8 @@ Digit           = [0-9]
 Integer         = {Digit}+
 Word            = [a-zA-Z]
 Id              = {Word} ({Word}|{Digit})*
-Symbols			= [!-/]
-Literal         = \"({Word}|{Digit}|{Whitespace}|{Symbols})+\"
+Symbols         = [!*\\\:+-=<>,.;/]
+Literal         = \"({Word}|{Digit}|{Whitespace}|{Symbols})*\"
 Boolean         = [false | true] 
 
 %%
