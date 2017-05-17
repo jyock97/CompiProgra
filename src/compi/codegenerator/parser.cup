@@ -1,4 +1,4 @@
-package proyectocompi;
+package compi.logic;
 import java_cup.runtime.*;
 
 terminal            ADD, MINUS, TIMES, DIV, LPAREN, RPAREN, SEMICOLON, EQUALS, LBRACE, RBRACE, AND, OR, DIF, LESS, GREATER, ASSIGN, LITERAL;

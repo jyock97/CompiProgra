@@ -1,8 +1,9 @@
-package proyectocompi;
+package compi.logic;
 import java_cup.runtime.*;
 
 %%
 
+%public
 %class Lexer
 %unicode
 %cup
@@ -23,7 +24,8 @@ Digit           = [0-9]
 Integer         = {Digit}+
 Word            = [a-zA-Z]
 Id              = {Word} ({Word}|{Digit})*
-Literal         = \"({Word}|{Digit}|{Whitespace})+\"
+Symbols			= [!-/]
+Literal         = \"({Word}|{Digit}|{Whitespace}|{Symbols})+\"
 Boolean         = [false | true] 
 
 %%
