@@ -11,20 +11,20 @@ public class sym {
   public static final int TIMES = 4;
   public static final int AND = 12;
   public static final int ELSE = 22;
-  public static final int SEMICOLON = 8;
+  public static final int SEMICOLON = 10;
   public static final int INT = 25;
   public static final int OR = 13;
-  public static final int RBRACE = 11;
+  public static final int RBRACE = 9;
   public static final int RPAREN = 7;
   public static final int WHILE = 21;
   public static final int GREATER = 16;
   public static final int IF = 20;
   public static final int LITERAL = 18;
   public static final int LPAREN = 6;
-  public static final int LBRACE = 10;
+  public static final int LBRACE = 8;
   public static final int ID = 29;
   public static final int BOOLEAN = 28;
-  public static final int EQUALS = 9;
+  public static final int EQUALS = 11;
   public static final int EOF = 0;
   public static final int MAIN = 19;
   public static final int BREAK = 26;
@@ -47,10 +47,10 @@ public class sym {
   "DIV",
   "LPAREN",
   "RPAREN",
-  "SEMICOLON",
-  "EQUALS",
   "LBRACE",
   "RBRACE",
+  "SEMICOLON",
+  "EQUALS",
   "AND",
   "OR",
   "DIF",
