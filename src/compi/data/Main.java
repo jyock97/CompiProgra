@@ -1,4 +1,4 @@
-package compi.codegenerator;
+package compi.data;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,8 +9,8 @@ public class Main {
 
 	public static void main(String[] args) throws internal_error, IOException, Exception {
 		
-		String[] in = {"-parser", "Parser", "src/compi/codegenerator/parser.cup"};
-        jflex.Main.generate(new File("src/compi/codegenerator/lexer.flex"));
+		String[] in = {"-parser", "Parser", "src/compi/data/parser.cup"};
+        jflex.Main.generate(new File("src/compi/data/lexer.flex"));
         java_cup.Main.main(in);
         
         new File("Parser.java").renameTo(new File("src/compi/logic/Parser.java"));
