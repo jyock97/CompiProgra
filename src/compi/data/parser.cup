@@ -1,13 +1,15 @@
 package compi.logic;
 import java_cup.runtime.*;
 import compi.logic.datastructures.*;
+import compi.codegenerator.CodeGenerator;
 
 action code {:
 
 	TypeTable tTable;
+	CodeGenerator cGenerator;
 	private void initDataStructures(){
 		tTable = new TypeTable();
-		cGenerator = new CodeGenerator();
+		cGenerator = new CodeGenerator(tTable);
 	}
 	
 	private void errorIdDeclarationExist(String id){
@@ -39,7 +41,7 @@ terminal String		ID;
 
 non terminal        program, mainProgram;
 non terminal		lstDeclaration, lstStatement;
-non terminal		declaration, statement, ifStatement, whileStatement;
+non terminal		declaration, statement, ifStatement, whileStatement, putwStatement, putsStatement, breakStatement;
 non terminal		condition, expr;
 
 precedence left		ASSIGN;
@@ -57,8 +59,8 @@ program ::=					{:
 					| mainProgram
 					;
 
-mainProgram ::=		MAIN LPAREN RPAREN LBRACE lstStatement RBRACE {: System.out.println("main"); :}
-					| MAIN LPAREN RPAREN LBRACE RBRACE {: System.out.println("main"); :}
+mainProgram ::=		MAIN LPAREN RPAREN LBRACE lstStatement RBRACE {:  :}
+					| MAIN LPAREN RPAREN LBRACE RBRACE {:  :}
 					;
 
 lstStatement ::=	lstStatement statement
@@ -66,16 +68,33 @@ lstStatement ::=	lstStatement statement
 					;
 
 statement ::=		expr SEMICOLON
+					| condition SEMICOLON
 					| ifStatement
 					| whileStatement
+					| putwStatement
+					| putsStatement
+					| breakStatement
 					| SEMICOLON
 					;
 
-ifStatement ::=		IF LPAREN expr RPAREN LBRACE lstStatement RBRACE ELSE LBRACE lstStatement RBRACE
+ifStatement ::=		IF LPAREN condition RPAREN LBRACE lstStatement RBRACE ELSE LBRACE lstStatement RBRACE
 					| IF LPAREN expr RPAREN LBRACE lstStatement RBRACE
 					;
 
-whileStatement ::=	WHILE LPAREN expr RPAREN LBRACE lstStatement RBRACE
+whileStatement ::=	WHILE LPAREN condition RPAREN LBRACE lstStatement RBRACE
+					;
+					
+putwStatement ::= 	PUTW LPAREN expr RPAREN
+                                {: System.out.println("putw"); :}
+                    ;
+                    
+putsStatement ::=	PUTS LPAREN expr RPAREN
+                                {: System.out.println("puts"); :}
+					| PUTS LPAREN LITERAL RPAREN
+                                {: System.out.println("puts"); :}
+					;
+					
+breakStatement ::=	BREAK
 					;
 
 lstDeclaration ::=	lstDeclaration declaration SEMICOLON
@@ -85,7 +104,9 @@ lstDeclaration ::=	lstDeclaration declaration SEMICOLON
 declaration ::=		INT ID:id
 								{:
 									if(tTable.getSymbol(id) == null){
-										tTable.addSymbol(id, sym.INTEGER);
+										tTable.addSymbol(id, sym.INTEGER, cGenerator.memory);
+										cGenerator.memory--;
+										cGenerator.generateINT_ID(id);
 									}else{
 										errorIdDeclarationExist(id);
 									}
@@ -95,7 +116,9 @@ declaration ::=		INT ID:id
 									if(tTable.getSymbol(id) == null){
 										try {
 											new Integer((String) e);
-											tTable.addSymbol(id, sym.INTEGER, (String) e);
+											tTable.addSymbol(id, sym.INTEGER, (String) e, cGenerator.memory);
+											cGenerator.memory--;
+											cGenerator.generateINT_ID_EXPR(id, (String) e);
 										} catch (NumberFormatException exe) {
 											errorIntFormat((String) e);
 										}
@@ -109,6 +132,7 @@ declaration ::=		INT ID:id
 										try {
 											new Integer((String) e);
 											tTable.setSymbol(id, (String) e);
+											cGenerator.generateID_EXPR(id, (String) e);
 										} catch (NumberFormatException exe) {
 											errorIntFormat((String) e);
 										}
@@ -119,51 +143,40 @@ declaration ::=		INT ID:id
 					;
 
 condition ::=		expr:e1 EQUALS expr:e2 
-                                {: System.out.println("igual"); :}
+                                {:  :}
 					| expr:e1 GREATER expr:e2 
-                                {: System.out.println("mayor"); :}
+                                {:  :}
 					| expr:e1 LESS expr:e2 
-                                {: System.out.println("menor"); :}
+                                {:  :}
 					| expr:e1 AND expr:e2 
-                                {: System.out.println("and"); :}
+                                {:  :}
 					| expr:e1 OR expr:e2 
-                                {: System.out.println("or"); :}
+                                {:  :}
 					| expr:e1 DIF expr:e2 
-                                {: System.out.println("diferente"); :}
+                                {:  :}
 					| BOOLEAN  
-                                {: System.out.println("boolean"); :} 
+                                {:  :} 
 					;
 
 
 expr ::=			expr:e1 ADD expr:e2 
-                                {: System.out.println("suma"); :}
+                                {:  :}
 					| expr:e1 MINUS expr:e2 
-                                {: System.out.println("resta"); :}
+                                {:  :}
 					| expr:e1 TIMES expr:e2 
-                                {: System.out.println("multiplicacion"); :}
+                                {:  :}
 					| expr:e1 DIV expr:e2 
-                                {: System.out.println("division"); :}
+                                {:  :}
 					| LPAREN expr:e RPAREN
-                                 {: System.out.println("parentesis"); :}
-					| PUTS LPAREN expr RPAREN
-                                {: System.out.println("puts"); :}
-					| PUTS LPAREN LITERAL RPAREN
-                                {: System.out.println("puts"); :}
-					| PUTW LPAREN expr RPAREN
-                                {: System.out.println("putw"); :}
-					| BREAK
-                                {: System.out.println("break"); :}
+                                 {:  :}
 					| declaration
                                 {::}
-					| condition
-                                {::}
 					| ID
-                                {: System.out.println("id"); :}
+                                {:  :}
 					| LITERAL
-                                {: System.out.println("literal"); :}
+                                {:  :}
 					| INTEGER:e   
                                 {: 
-                                	System.out.println("num");
                                 	RESULT = e;  
                                 :}
 					;

@@ -30,25 +30,25 @@ public class TypeTable {
 		lastScope = table.size()-1;
 	}
 	
-	public boolean addSymbol(String id, int type, String value){
+	public boolean addSymbol(String id, int type, String value, int direction){
 		
 		HashMap<String, Symbol> currentScope = table.get(lastScope);
 		
 		if(currentScope.get(id) != null)
 			return false;
 		
-		currentScope.put(id, new Symbol(id, type, value));
+		currentScope.put(id, new Symbol(id, type, value, direction));
 		return true;
 	}
 	
-	public boolean addSymbol(String id, int type){
+	public boolean addSymbol(String id, int type, int direction){
 		
 		HashMap<String, Symbol> currentScope = table.get(lastScope);
 
 		if(currentScope.get(id) != null)
 			return false;
 		
-		currentScope.put(id, new Symbol(id, type));
+		currentScope.put(id, new Symbol(id, type, direction));
 		return true;
 	}
 	
