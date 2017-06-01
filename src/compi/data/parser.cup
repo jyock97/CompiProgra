@@ -9,7 +9,7 @@ action code {:
 	CodeGenerator cGenerator;
 	private void initDataStructures(){
 		tTable = new TypeTable();
-		cGenerator = new CodeGenerator(tTable);
+		cGenerator = CodeGenerator.getCodeGenerator(tTable);
 	}
 	
 	private void errorIdDeclarationExist(String id){
@@ -28,21 +28,26 @@ action code {:
 	}
 :}
 
-terminal			ADD, MINUS;
-terminal			TIMES, DIV;
-terminal			LPAREN, RPAREN, LBRACE, RBRACE, SEMICOLON;
-terminal			EQUALS, AND, OR, DIF, LESS, GREATER, ASSIGN;
-terminal			LITERAL;
-terminal            MAIN, IF, WHILE, ELSE, PUTW, PUTS, INT, BREAK;
-terminal String		INTEGER;
-terminal String		BOOLEAN;
-terminal String		ID;
+parser code {:
+	//metodos por defecto de cup para errores
+:}
+
+terminal				ADD, MINUS;
+terminal				TIMES, DIV;
+terminal				LPAREN, RPAREN, LBRACE, RBRACE, SEMICOLON;
+terminal				EQUALS, AND, OR, DIF, LESS, GREATER, ASSIGN;
+terminal				LITERAL;
+terminal            	MAIN, IF, WHILE, ELSE, PUTW, PUTS, INT, BREAK;
+terminal String			INTEGER;
+terminal String			BOOLEAN;
+terminal String			ID;
 
 
-non terminal        program, mainProgram;
-non terminal		lstDeclaration, lstStatement;
-non terminal		declaration, statement, ifStatement, whileStatement, putwStatement, putsStatement, breakStatement;
-non terminal		condition, expr;
+non terminal        	program, mainProgram;
+non terminal			lstDeclaration, lstStatement;
+non terminal			declaration, statement, ifStatement, whileStatement, putwStatement, putsStatement, breakStatement;
+non terminal			condition;
+non terminal Expression expr;
 
 precedence left		ASSIGN;
 precedence left		AND, OR;
@@ -104,37 +109,39 @@ lstDeclaration ::=	lstDeclaration declaration SEMICOLON
 declaration ::=		INT ID:id
 								{:
 									if(tTable.getSymbol(id) == null){
-										tTable.addSymbol(id, sym.INTEGER, cGenerator.memory);
-										cGenerator.memory--;
-										cGenerator.generateINT_ID(id);
+										tTable.addSymbol(id, sym.INTEGER, cGenerator.memory--);
+										cGenerator.generateID(id);
 									}else{
 										errorIdDeclarationExist(id);
 									}
 								:}
-					| INT ID:id ASSIGN expr:e
+					| INT ID:id	
 								{:
 									if(tTable.getSymbol(id) == null){
-										try {
-											new Integer((String) e);
-											tTable.addSymbol(id, sym.INTEGER, (String) e, cGenerator.memory);
-											cGenerator.memory--;
-											cGenerator.generateINT_ID_EXPR(id, (String) e);
-										} catch (NumberFormatException exe) {
-											errorIntFormat((String) e);
-										}
+										tTable.addSymbol(id, sym.INTEGER, cGenerator.memory--);
+										cGenerator.generateID(id);
 									}else{
 										errorIdDeclarationExist(id);
+									}
+								:} 
+					ASSIGN expr:e
+								{:
+									try {
+										//new Integer(e.getValue());
+										cGenerator.generateID_EXPR(id, e);
+									} catch (NumberFormatException exe) {
+										errorIntFormat( e.getValue());
 									}
 								:}
 					| ID:id ASSIGN expr:e
 								{:
 									if(tTable.getSymbol(id) != null){
 										try {
-											new Integer((String) e);
-											tTable.setSymbol(id, (String) e);
-											cGenerator.generateID_EXPR(id, (String) e);
+											//new Integer( e.getValue());
+											tTable.setSymbol(id,  e.getValue());
+											cGenerator.generateID_EXPR(id, e);
 										} catch (NumberFormatException exe) {
-											errorIntFormat((String) e);
+											errorIntFormat(e.getValue());
 										}
 									}else{
 										errorIdDeclarationNotExist(id);
@@ -158,25 +165,38 @@ condition ::=		expr:e1 EQUALS expr:e2
                                 {:  :} 
 					;
 
-
 expr ::=			expr:e1 ADD expr:e2 
-                                {:  :}
-					| expr:e1 MINUS expr:e2 
-                                {:  :}
-					| expr:e1 TIMES expr:e2 
-                                {:  :}
-					| expr:e1 DIV expr:e2 
-                                {:  :}
-					| LPAREN expr:e RPAREN
-                                 {:  :}
-					| declaration
-                                {::}
-					| ID
-                                {:  :}
-					| LITERAL
-                                {:  :}
-					| INTEGER:e   
                                 {: 
-                                	RESULT = e;  
+                                	RESULT = e1.add(e2);
+                                :}
+					| expr:e1 MINUS expr:e2 
+                                {:
+                                	RESULT = e1.sub(e2);
+                                :}
+					| expr:e1 TIMES expr:e2 
+                                {:
+                                	RESULT = e1.mul(e2);
+                                :}
+					| expr:e1 DIV expr:e2 
+                                {:
+                                	RESULT = e1.div(e2);
+                                :}
+					| LPAREN expr:e RPAREN
+					| declaration
+					| ID:id
+                                {:
+                                	if(tTable.getSymbol(id) != null){
+	                                	RESULT = new Expression(id, tTable.getSymbol(id).getDirection()); 
+									}else{
+										errorIdDeclarationNotExist(id);
+									}
+                                :}
+					| LITERAL:e
+                                {:  :}
+					| INTEGER:i
+                                {:
+                                	Expression e = new Expression(i, cGenerator.memory--);
+                                	cGenerator.generateIntLiteral(e);
+                                	RESULT = e;
                                 :}
 					;
