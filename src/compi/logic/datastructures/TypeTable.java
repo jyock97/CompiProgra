@@ -52,12 +52,6 @@ public class TypeTable {
 		return true;
 	}
 	
-	public void setSymbol(String id, String value){
-		
-		Symbol s = getSymbol(id);
-		s.setValue(value);
-	}
-	
 	public Symbol getSymbol(String id){
 		
 		int cont = lastScope;

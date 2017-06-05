@@ -23,51 +23,54 @@ import java_cup.runtime.*;
     }
 %}
 
-Whitespace      = [ \t\n]
-Digit           = [0-9]
-Integer         = {Digit}+
-Word            = [a-zA-Z]
-Id              = {Word} ({Word}|{Digit})*
-Symbols			= [!-/]
-Literal         = \"([\x20-\x21\x23-\xFE])*\"
-Boolean         = [false | true] 
+Whitespace		= [ \t\n]
+Digit			= [0-9]
+IntegerLiteral	= {Digit}+
+StringLiteral	= \"([\x20-\x21\x23-\xFE])*\"
+Word			= [a-zA-Z]
+Id				= {Word}({Word}|{Digit})*
 
 %%
 
 <YYINITIAL> {
-    {Whitespace}	{}
+    {Whitespace}		{}
 
-    "main"			{ return symbol(sym.MAIN); }
-    "if"			{ return symbol(sym.IF); }
-    "else"			{ return symbol(sym.ELSE); }
-    "while"			{ return symbol(sym.WHILE); }
-    "break"			{ return symbol(sym.BREAK); }
-    "int"			{ return symbol(sym.INT); }
-    "puts"			{ return symbol(sym.PUTS); }
-    "putw"			{ return symbol(sym.PUTW); }
+    "main"				{ return symbol(sym.MAIN); }
+    "if"				{ return symbol(sym.IF); }
+    "else"				{ return symbol(sym.ELSE); }
+    "while"				{ return symbol(sym.WHILE); }
+    "break"				{ return symbol(sym.BREAK); }
+    "int"				{ return symbol(sym.INTEGER); }
+    "string"			{ return symbol(sym.STRING); }
+    "boolean"			{ return symbol(sym.BOOLEAN); }
+    "puts"				{ return symbol(sym.PUTS); }
+    "putw"				{ return symbol(sym.PUTW); }
+    "true"				{ return symbol(sym.BOOLEAN_LITERAL, new String(yytext())); }
+    "false"				{ return symbol(sym.BOOLEAN_LITERAL, new String(yytext())); }
+
+    "+"					{ return symbol(sym.ADD); }
+    "-"					{ return symbol(sym.MINUS); }
+    "*"					{ return symbol(sym.TIMES); }
+    "/"					{ return symbol(sym.DIV); }
+    "("					{ return symbol(sym.LPAREN); }
+    ")"					{ return symbol(sym.RPAREN); }
+    ";"					{ return symbol(sym.SEMICOLON); }
+    "="					{ return symbol(sym.ASSIGN); }
+    "=="				{ return symbol(sym.EQUALS); }
+    "{"					{ return symbol(sym.LBRACE); }
+    "}"					{ return symbol(sym.RBRACE); }
+    "<"					{ return symbol(sym.LESS); }
+    ">"					{ return symbol(sym.GREATER); }
+    "¡="				{ return symbol(sym.DIF); }
+    "||"				{ return symbol(sym.OR); }
+    "&&"				{ return symbol(sym.AND); }
+
+    {StringLiteral}		{ return symbol(sym.STRING_LITERAL, new String(yytext())); }
+	{IntegerLiteral}	{ return symbol(sym.INTEGER_LITERAL, new String(yytext())); }
+    {Id}				{ //System.out.println("Es id");
+    						return symbol(sym.ID, new String(yytext())); }
     
-    "+"				{ return symbol(sym.ADD); }
-    "-"				{ return symbol(sym.MINUS); }
-    "*"				{ return symbol(sym.TIMES); }
-    "/"				{ return symbol(sym.DIV); }
-    "("				{ return symbol(sym.LPAREN); }
-    ")"				{ return symbol(sym.RPAREN); }
-    ";"				{ return symbol(sym.SEMICOLON); }
-    "="				{ return symbol(sym.ASSIGN); }
-    "=="			{ return symbol(sym.EQUALS); }
-    "{"				{ return symbol(sym.LBRACE); }
-    "}"				{ return symbol(sym.RBRACE); }
-    "<"				{ return symbol(sym.LESS); }
-    ">"				{ return symbol(sym.GREATER); }
-    "¡="			{ return symbol(sym.DIF); }
-    "||"			{ return symbol(sym.OR); }
-    "&&"			{ return symbol(sym.AND); }
-
-    {Id}			{ return symbol(sym.ID, new String(yytext())); }
-    {Literal}		{ return symbol(sym.LITERAL, new String(yytext())); }
-    {Integer}		{ return symbol(sym.INTEGER, new String(yytext())); }
-    {Boolean}		{ return symbol(sym.BOOLEAN, new String(yytext())); }
-    .				{ noCharacterError(yytext()); }
+    .					{ noCharacterError(yytext()); }
 }
 
 

@@ -5,6 +5,7 @@ import compi.codegenerator.CodeGenerator;
 
 action code {:
 
+	int ifCont = 0;
 	TypeTable tTable;
 	CodeGenerator cGenerator;
 	private void initDataStructures(){
@@ -22,9 +23,9 @@ action code {:
 		System.out.println("[ERROR]: El identificador <" + id + "> no se ha declarado.");
 	}
 	
-	private void errorIntFormat(String exp){
+	private void errorTypeFormat(int type){
 		//crear un string builder para poner todos los posibles errores
-		System.out.println("[ERROR]: <" + exp + "> no es un formato valido para un entero.");
+		System.out.println("[ERROR]: <" + type + "> no es un formato valido para un entero.");
 	}
 :}
 
@@ -36,17 +37,18 @@ terminal				ADD, MINUS;
 terminal				TIMES, DIV;
 terminal				LPAREN, RPAREN, LBRACE, RBRACE, SEMICOLON;
 terminal				EQUALS, AND, OR, DIF, LESS, GREATER, ASSIGN;
-terminal				LITERAL;
-terminal            	MAIN, IF, WHILE, ELSE, PUTW, PUTS, INT, BREAK;
-terminal String			INTEGER;
-terminal String			BOOLEAN;
+terminal				MAIN, IF, WHILE, ELSE, PUTW, PUTS, BREAK;
+terminal				INTEGER, STRING, BOOLEAN;
+terminal String			STRING_LITERAL, INTEGER_LITERAL, BOOLEAN_LITERAL;
 terminal String			ID;
 
 
-non terminal        	program, mainProgram;
-non terminal			lstDeclaration, lstStatement;
-non terminal			declaration, statement, ifStatement, whileStatement, putwStatement, putsStatement, breakStatement;
-non terminal			condition;
+non terminal			program, mainProgram, subProgram;
+non terminal			lstDeclaration, lstStatement, lstSubProgram;
+non terminal			declaration;
+non terminal			statement, ifStatement, whileStatement, putwStatement, putsStatement, breakStatement;
+non terminal Integer 	varType;
+non terminal Expression	condition;
 non terminal Expression expr;
 
 precedence left		ASSIGN;
@@ -57,146 +59,177 @@ precedence left		TIMES, DIV;
 precedence left		LPAREN, RPAREN;
 
 
-program ::=					{:
-								initDataStructures();
-							:}
-					lstDeclaration mainProgram 
-					| mainProgram
-					;
-
-mainProgram ::=		MAIN LPAREN RPAREN LBRACE lstStatement RBRACE {:  :}
-					| MAIN LPAREN RPAREN LBRACE RBRACE {:  :}
-					;
-
-lstStatement ::=	lstStatement statement
-					|statement
-					;
-
-statement ::=		expr SEMICOLON
-					| condition SEMICOLON
-					| ifStatement
-					| whileStatement
-					| putwStatement
-					| putsStatement
-					| breakStatement
-					| SEMICOLON
-					;
-
-ifStatement ::=		IF LPAREN condition RPAREN LBRACE lstStatement RBRACE ELSE LBRACE lstStatement RBRACE
-					| IF LPAREN expr RPAREN LBRACE lstStatement RBRACE
-					;
-
-whileStatement ::=	WHILE LPAREN condition RPAREN LBRACE lstStatement RBRACE
-					;
-					
-putwStatement ::= 	PUTW LPAREN expr RPAREN
-                                {: System.out.println("putw"); :}
-                    ;
-                    
-putsStatement ::=	PUTS LPAREN expr RPAREN
-                                {: System.out.println("puts"); :}
-					| PUTS LPAREN LITERAL RPAREN
-                                {: System.out.println("puts"); :}
-					;
-					
-breakStatement ::=	BREAK
-					;
-
-lstDeclaration ::=	lstDeclaration declaration SEMICOLON
-					|declaration SEMICOLON
-					;
-
-declaration ::=		INT ID:id
-								{:
-									if(tTable.getSymbol(id) == null){
-										tTable.addSymbol(id, sym.INTEGER, cGenerator.memory--);
-										cGenerator.generateID(id);
-									}else{
-										errorIdDeclarationExist(id);
-									}
+program ::=						{:
+									initDataStructures();
 								:}
-					| INT ID:id	
+						lstDeclaration mainProgram lstSubProgram
 								{:
-									if(tTable.getSymbol(id) == null){
-										tTable.addSymbol(id, sym.INTEGER, cGenerator.memory--);
-										cGenerator.generateID(id);
-									}else{
-										errorIdDeclarationExist(id);
-									}
+								//System.out.println(cGenerator.sBuilder);
 								:} 
-					ASSIGN expr:e
+						;
+
+lstDeclaration ::=		lstDeclaration declaration SEMICOLON
+						|/*epsilon*/
+						;
+
+declaration ::=			varType:t ID:id
 								{:
-									try {
-										//new Integer(e.getValue());
-										cGenerator.generateID_EXPR(id, e);
-									} catch (NumberFormatException exe) {
-										errorIntFormat( e.getValue());
+									if(tTable.getSymbol(id) == null){
+										tTable.addSymbol(id, t, cGenerator.direction++);
+										cGenerator.generateID(id);
+									}else{
+										errorIdDeclarationExist(id);
 									}
 								:}
-					| ID:id ASSIGN expr:e
+						| varType:t ID:id ASSIGN expr:e
+								{:
+									if(tTable.getSymbol(id) == null){
+										tTable.addSymbol(id, t, cGenerator.direction++);
+										cGenerator.generateID(id);
+										//validar tipo
+										cGenerator.generateID_EXPR(id, e);
+									}else{
+										errorIdDeclarationExist(id);
+									}
+								:}
+						| ID:id ASSIGN expr:e
 								{:
 									if(tTable.getSymbol(id) != null){
-										try {
-											//new Integer( e.getValue());
-											tTable.setSymbol(id,  e.getValue());
-											cGenerator.generateID_EXPR(id, e);
-										} catch (NumberFormatException exe) {
-											errorIntFormat(e.getValue());
-										}
+										cGenerator.generateID_EXPR(id, e);
 									}else{
 										errorIdDeclarationNotExist(id);
 									}
 								:}
-					;
+						;
 
-condition ::=		expr:e1 EQUALS expr:e2 
-                                {:  :}
-					| expr:e1 GREATER expr:e2 
-                                {:  :}
-					| expr:e1 LESS expr:e2 
-                                {:  :}
-					| expr:e1 AND expr:e2 
-                                {:  :}
-					| expr:e1 OR expr:e2 
-                                {:  :}
-					| expr:e1 DIF expr:e2 
-                                {:  :}
-					| BOOLEAN  
-                                {:  :} 
-					;
+varType ::=				INTEGER
+								{:
+									RESULT = sym.INTEGER;
+								:}
+						| STRING
+								{:
+									RESULT = sym.STRING;
+								:}
+						| BOOLEAN
+								{:
+									RESULT = sym.BOOLEAN;
+								:}
+						;
 
-expr ::=			expr:e1 ADD expr:e2 
-                                {: 
+mainProgram ::=			MAIN LPAREN RPAREN LBRACE lstStatement RBRACE
+						;
+
+lstStatement ::=		lstStatement statement
+						|/*epsilon*/
+						;
+
+statement ::=			expr SEMICOLON
+						| ifStatement
+						| whileStatement
+						| breakStatement
+						| putwStatement
+						| putsStatement
+						;
+
+expr ::=				condition:e
+								{:
+                                	RESULT = e;
+                                :}
+						|expr:e1 ADD expr:e2 
+                                {:
                                 	RESULT = e1.add(e2);
                                 :}
-					| expr:e1 MINUS expr:e2 
+						| expr:e1 MINUS expr:e2 
                                 {:
                                 	RESULT = e1.sub(e2);
                                 :}
-					| expr:e1 TIMES expr:e2 
+						| expr:e1 TIMES expr:e2 
                                 {:
                                 	RESULT = e1.mul(e2);
                                 :}
-					| expr:e1 DIV expr:e2 
+						| expr:e1 DIV expr:e2 
                                 {:
                                 	RESULT = e1.div(e2);
                                 :}
-					| LPAREN expr:e RPAREN
-					| declaration
-					| ID:id
+						| LPAREN expr:e RPAREN
+								{:
+                                	RESULT = e;
+                                :}
+						| declaration
+						| ID:id
                                 {:
                                 	if(tTable.getSymbol(id) != null){
-	                                	RESULT = new Expression(id, tTable.getSymbol(id).getDirection()); 
+	                                	RESULT = new Expression(tTable.getSymbol(id).getDirection(), sym.ID); 
 									}else{
 										errorIdDeclarationNotExist(id);
 									}
                                 :}
-					| LITERAL:e
-                                {:  :}
-					| INTEGER:i
+						| STRING_LITERAL:l
                                 {:
-                                	Expression e = new Expression(i, cGenerator.memory--);
-                                	cGenerator.generateIntLiteral(e);
+                                	Expression e = new Expression(cGenerator.direction++, sym.STRING);
+                                	cGenerator.direction -= l.length();
+                                	cGenerator.generateStringLiteral(l, e);
+                                	RESULT = e;
+                                :}
+						| INTEGER_LITERAL:i
+                                {:
+                                	Expression e = new Expression(cGenerator.direction++, sym.INTEGER);
+                                	cGenerator.generateIntegerLiteral(i, e);
                                 	RESULT = e;
                                 :}
 					;
+
+condition ::=		expr:e1 EQUALS expr:e2
+								{:
+									RESULT = e1.equals(e2);
+								:}
+					| expr:e1 GREATER expr:e2
+								{:
+									RESULT = e1.greater(e2);
+								:}
+					| expr:e1 LESS expr:e2
+								{:
+									RESULT = e1.less(e2);
+								:}
+					| expr:e1 AND expr:e2
+								{:
+									RESULT = e1.and(e2);
+								:}
+					| expr:e1 OR expr:e2
+								{:
+									RESULT = e1.or(e2);
+								:}
+					| expr:e1 DIF expr:e2
+								{:
+									RESULT = e1.dif(e2);
+								:}
+					| BOOLEAN_LITERAL:b
+								{:
+									Expression e = new Expression(cGenerator.direction++, sym.BOOLEAN);
+									cGenerator.generateBooleanLiteral(b, e);
+									RESULT = e;
+								:} 
+					;
+
+ifStatement ::=			IF LPAREN condition RPAREN LBRACE lstStatement RBRACE
+						| IF LPAREN condition RPAREN LBRACE lstStatement RBRACE ELSE LBRACE lstStatement RBRACE
+						;
+
+whileStatement ::=		WHILE LPAREN condition RPAREN LBRACE lstStatement RBRACE
+						;
+
+breakStatement ::=		BREAK SEMICOLON
+						;
+
+putwStatement ::=		PUTW LPAREN expr RPAREN
+						;
+
+putsStatement ::=		PUTS LPAREN expr RPAREN
+						;
+
+lstSubProgram ::=		lstSubProgram subProgram
+						|/*epsilon*/
+						;
+
+subProgram ::=			ID LPAREN RPAREN LBRACE RBRACE
+						;
