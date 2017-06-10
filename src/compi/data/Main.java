@@ -2,6 +2,8 @@ package compi.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import java_cup.internal_error;
 
@@ -16,5 +18,6 @@ public class Main {
         new File("Parser.java").renameTo(new File("src/compi/logic/Parser.java"));
         new File("sym.java").renameTo(new File("src/compi/logic/sym.java"));
         new File("src/compi/data/Lexer.java").renameTo(new File("src/compi/logic/Lexer.java"));
+        HashMap<String, Integer> ids = new HashMap<>();
 	}
 }

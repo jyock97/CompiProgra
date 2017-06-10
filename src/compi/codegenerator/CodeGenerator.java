@@ -1,6 +1,7 @@
 package compi.codegenerator;
 
 
+import compi.logic.sym;
 import compi.logic.datastructures.Expression;
 import compi.logic.datastructures.Symbol;
 import compi.logic.datastructures.TypeTable;
@@ -27,7 +28,7 @@ public class CodeGenerator {
 	
 	private CodeGenerator(TypeTable table) {
 		
-		this.direction = 0;	// Diraccion maxima de la memoria
+		this.direction = 1;	// Diraccion maxima de la memoria
 		this.table = table;
 		this.sBuilder = new StringBuilder();
 	}
@@ -71,19 +72,60 @@ public class CodeGenerator {
 			sBuilder.append("LOAD_INTEGER \t\t" + 0 + ", null, #" + e.getDirection() + "\n");
 	}
 	
-	public void generateValidateEquals(Expression e){
-		System.out.print("CMP \t\t" + e.getDirection() + ", 1, #" + e.getDirection() + "\n");
+	public void generateCompare(Expression e){
+		System.out.print("CMP \t\t#" + e.getDirection() + ", 1, #" + e.getDirection() + "\n");
 	}
 
-	public void generateBranchNotEquals(String label) {
-		System.out.print("BNE \t\t" + label + ", null, #" + "e.getDirection()" + "\n");
+	public void generateBranchNotTrue(String label, Expression e) {
+		
+		switch(e.getType()){
+		
+		case sym.EQUALS:
+			System.out.print("BNE \t\t" + "null, null, " + label + "\n");
+			break;
+			
+		case sym.DIF:
+			System.out.print("BE \t\t" + "null, null, " + label + "\n");
+			break;
+		
+		case sym.GREATER:
+			System.out.print("BN \t\t" + "null, null, " + label + "\n");
+			break;
+		
+		case sym.LESS:
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			break;
+		}
 	}
 
 	public void generateLabel(String label) {
-		System.out.print("LABEL \t\t" + label + ", null, #" + "e.getDirection()" + "\n");
+		System.out.print("LABEL \t\t" + "null, null, " + label + "\n");
 	}
 
-	public void generateJmpLabel(String label) {
-		System.out.print("JMP \t\t" + label + ", null, #" + "e.getDirection()" + "\n");
+	public void generateBranch(String label) {
+		System.out.print("BR \t\t" + "null, null, " + label + "\n");
+	}
+
+	public void printString(Expression e) {
+		
+		System.out.print("WR_STR \t\t" + "null, null, " + e.getDirection() + "\n");
+	}
+
+	public void printNumber(Expression e) {
+		
+		System.out.print("WR_INT \t" + "null, null, " + e.getDirection() + "\n");
+	}
+
+	public void generateReturn(Expression e) {
+		
+		System.out.print("RETURN \t" + "null, null, " + e.getDirection() + "\n");
+	}
+
+	public void generateSubProgramCall(String id) {
+		System.out.print("CALL \t" + "null, null, " + id + "\n");
+	}
+	
+	public void generateSubProgramId(String id) {
+		
 	}
 }

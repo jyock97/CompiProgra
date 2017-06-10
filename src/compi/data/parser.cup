@@ -5,10 +5,15 @@ import compi.codegenerator.CodeGenerator;
 
 action code {:
 
-	int ifCont = 0;
+	int ifCont = 0,
+		whileCont = 0,
+		subProgramCont = 0;
+	StringBuilder semanticErrors;
 	TypeTable tTable;
 	CodeGenerator cGenerator;
+	
 	private void initDataStructures(){
+		semanticErrors = new StringBuilder(); 
 		tTable = new TypeTable();
 		cGenerator = CodeGenerator.getCodeGenerator(tTable);
 	}
@@ -16,28 +21,92 @@ action code {:
 	private void errorIdDeclarationExist(String id){
 		//crear un string builder para poner todos los posibles errores
 		System.out.println("[ERROR]: El identificador <" + id + "> ya fue declarado.");
+		semanticErrors.append("[ERROR]: El identificador <" + id + "> ya fue declarado. \n");
 	}
 	
 	private void errorIdDeclarationNotExist(String id){
 		//crear un string builder para poner todos los posibles errores
 		System.out.println("[ERROR]: El identificador <" + id + "> no se ha declarado.");
+		semanticErrors.append("[ERROR]: El identificador <" + id + "> no se ha declarado. \n");
 	}
 	
 	private void errorTypeFormat(int type){
 		//crear un string builder para poner todos los posibles errores
 		System.out.println("[ERROR]: <" + type + "> no es un formato valido para un entero.");
+		semanticErrors.append("[ERROR]: <" + type + "> no es un formato valido para un entero. \n");
+	}
+	
+	private void errorNoWhileForBreak(){
+		System.out.println("[ERROR]: Sentencia <break> fuera de un <while>");
+		semanticErrors.append("[ERROR]: Sentencia <break> fuera de un <while> \n");
+	}
+	
+	private void errorSubProgramDeclaration(String id){
+		System.out.println("[ERROR]: No se puede declarar la variable <" + id + ">, ya existe un metoro <" + id + ">");
+		semanticErrors.append("[ERROR]: No se puede declarar la variable <" + id + ">, ya existe un metoro <" + id + "> \n");
+	}
+	
+	private void errorIdDeclarationSubProgram(String id){
+		System.out.println("[ERROR]: Procedimiento <" + id + "> ya fue declarado");
+		semanticErrors.append("[ERROR]: Procedimiento <" + id + "> ya fue declarado \n");
+	}
+	
+	private void errorAssignNullProcedure(String id){
+		System.out.println("[ERROR]: No se asigna ningun valor a la variable <" + id + ">");
+		semanticErrors.append("[ERROR]: No se asigna ningun valor a la variable <" + id + "> \n");
+	}
+	
+	private void errorAssignDiferentType(String id, Expression e){
+		String type = "desconocido";
+		
+		switch (e.getType()) {
+		case sym.INTEGER:
+			type = "Integer";
+			break;
+			
+		case sym.STRING:
+			type = "STRING";
+			break;
+			
+		case sym.BOOLEAN:
+			type = "BOOLEAN";
+			break;
+		}
+		System.out.println("[ERROR]: Variable <" + id + "> no es de tipo <" + type + ">");
+		semanticErrors.append("[ERROR]: Variable <" + id + "> no es de tipo <" + type + "> \n");
+	}
+	
+	private void errorNoProcedure(String id){
+		System.out.println("[ERROR]: No existe el procedimiento <" + id + ">");
+		semanticErrors.append("[ERROR]: No existe el procedimiento <" + id + "> \n");
 	}
 :}
 
 parser code {:
-	//metodos por defecto de cup para errores
-:}
+
+  public void report_fatal_error(String message, Object info){
+      //System.err.println("Can't recover from previous error(s), giving up.");
+      System.err.println("Error tipo 1");
+    }
+
+    public void report_error(String message, Object info){
+      System.out.println("Error tipo 2");
+    }
+    
+    public void syntax_error(Symbol cur_token){
+    	System.out.println("Error tipo 3");
+    }
+    
+    public void unrecovered_syntax_error(Symbol cur_token){
+    	System.out.println("Error tipo 4");
+    }
+:};
 
 terminal				ADD, MINUS;
 terminal				TIMES, DIV;
 terminal				LPAREN, RPAREN, LBRACE, RBRACE, SEMICOLON;
 terminal				EQUALS, AND, OR, DIF, LESS, GREATER, ASSIGN;
-terminal				MAIN, IF, WHILE, ELSE, PUTW, PUTS, BREAK;
+terminal				MAIN, IF, ELSE, WHILE, BREAK, PUTW, PUTS, SUB_PROGRAM, RETURN, NULL;
 terminal				INTEGER, STRING, BOOLEAN;
 terminal String			STRING_LITERAL, INTEGER_LITERAL, BOOLEAN_LITERAL;
 terminal String			ID;
@@ -46,10 +115,14 @@ terminal String			ID;
 non terminal			program, mainProgram, subProgram;
 non terminal			lstDeclaration, lstStatement, lstSubProgram;
 non terminal			declaration;
-non terminal			statement, ifStatement, whileStatement, putwStatement, putsStatement, breakStatement;
+non terminal			statement;
+non terminal			ifStatement, elseStatement;
+non terminal			whileStatement, breakStatement;
+non terminal			putwStatement, putsStatement;
 non terminal Integer 	varType;
 non terminal Expression	condition;
 non terminal Expression expr;
+non terminal Expression subProgramCall, returnStatement;
 
 precedence left		ASSIGN;
 precedence left		AND, OR;
@@ -65,6 +138,7 @@ program ::=						{:
 						lstDeclaration mainProgram lstSubProgram
 								{:
 								//System.out.println(cGenerator.sBuilder);
+								System.out.println("\n");
 								:} 
 						;
 
@@ -75,8 +149,13 @@ lstDeclaration ::=		lstDeclaration declaration SEMICOLON
 declaration ::=			varType:t ID:id
 								{:
 									if(tTable.getSymbol(id) == null){
-										tTable.addSymbol(id, t, cGenerator.direction++);
-										cGenerator.generateID(id);
+										if(tTable.getProcedure(id) == null){
+											tTable.addSymbol(id, t, cGenerator.direction++);
+											tTable.addId(id, t);
+											cGenerator.generateID(id);
+										}else{
+											errorIdDeclarationSubProgram(id);
+										}
 									}else{
 										errorIdDeclarationExist(id);
 									}
@@ -84,10 +163,24 @@ declaration ::=			varType:t ID:id
 						| varType:t ID:id ASSIGN expr:e
 								{:
 									if(tTable.getSymbol(id) == null){
-										tTable.addSymbol(id, t, cGenerator.direction++);
-										cGenerator.generateID(id);
-										//validar tipo
-										cGenerator.generateID_EXPR(id, e);
+										if(tTable.getProcedure(id) == null){
+											if(e != null){											
+												if(e.getType() != sym.NULL){											
+													if(t == e.getType()){
+														tTable.addSymbol(id, t, cGenerator.direction++);
+														tTable.addId(id, t);
+														cGenerator.generateID(id);
+														cGenerator.generateID_EXPR(id, e);
+													}else{
+														errorAssignDiferentType(id, e);
+													}
+												}else{
+													errorAssignNullProcedure(id);
+												}
+											}
+										}else{
+											errorIdDeclarationSubProgram(id);
+										}
 									}else{
 										errorIdDeclarationExist(id);
 									}
@@ -95,7 +188,18 @@ declaration ::=			varType:t ID:id
 						| ID:id ASSIGN expr:e
 								{:
 									if(tTable.getSymbol(id) != null){
-										cGenerator.generateID_EXPR(id, e);
+										Integer t = tTable.getSymbol(id).getType();
+										if(e != null){
+											if(e.getType() != sym.NULL){											
+												if(t == e.getType()){
+													cGenerator.generateID_EXPR(id, e);
+												}else{
+													errorAssignDiferentType(id, e);
+												}
+											}else{
+												errorAssignNullProcedure(id);
+											}
+										}
 									}else{
 										errorIdDeclarationNotExist(id);
 									}
@@ -156,6 +260,10 @@ expr ::=				condition:e
                                 	RESULT = e;
                                 :}
 						| declaration
+						| subProgramCall:e
+								{:
+                                	RESULT = e;
+                                :}
 						| ID:id
                                 {:
                                 	if(tTable.getSymbol(id) != null){
@@ -167,7 +275,7 @@ expr ::=				condition:e
 						| STRING_LITERAL:l
                                 {:
                                 	Expression e = new Expression(cGenerator.direction++, sym.STRING);
-                                	cGenerator.direction -= l.length();
+                                	cGenerator.direction += l.length() - 2;
                                 	cGenerator.generateStringLiteral(l, e);
                                 	RESULT = e;
                                 :}
@@ -211,25 +319,119 @@ condition ::=		expr:e1 EQUALS expr:e2
 								:} 
 					;
 
-ifStatement ::=			IF LPAREN condition RPAREN LBRACE lstStatement RBRACE
-						| IF LPAREN condition RPAREN LBRACE lstStatement RBRACE ELSE LBRACE lstStatement RBRACE
+ifStatement ::=			IF 
+								{:
+									tTable.createScope();
+								:}
+						LPAREN condition:e RPAREN
+								{:
+									//cGenerator.generateCompare(e);
+                                	cGenerator.generateBranchNotTrue("Else#" + ++ifCont, e);
+								:}
+						LBRACE lstStatement RBRACE
+								{:
+									tTable.deleteScope();
+									cGenerator.generateBranch("EndIf#" + ifCont);
+								:}
+						elseStatement
 						;
 
-whileStatement ::=		WHILE LPAREN condition RPAREN LBRACE lstStatement RBRACE
+elseStatement ::=		ELSE
+								{:
+									tTable.createScope();
+									cGenerator.generateLabel("Else#" + ifCont);
+								:} 
+						LBRACE lstStatement RBRACE
+								{:
+									tTable.deleteScope();
+									cGenerator.generateLabel("EndIf#" + ifCont--);
+								:}
+						|/*epsilon*/
+								{:
+									cGenerator.generateLabel("Else#" + ifCont);
+									cGenerator.generateLabel("EndIf#" + ifCont--);
+								:}
+						;
+
+whileStatement ::=		WHILE
+								{:
+									tTable.createScope();
+									cGenerator.generateLabel("InitWhile#" + ++whileCont);
+								:}
+						LPAREN condition:e RPAREN
+								{:
+									cGenerator.generateBranchNotTrue("EndWhile#" + whileCont, e);
+								:}
+						LBRACE lstStatement RBRACE
+								{:
+									tTable.deleteScope();
+									cGenerator.generateLabel("InitWhile#" + whileCont--);
+								:}
 						;
 
 breakStatement ::=		BREAK SEMICOLON
+								{:
+									if(whileCont != 0){									
+									
+										cGenerator.generateBranch("EndWhile#" + whileCont);
+									}else{
+									
+										errorNoWhileForBreak();
+									}
+								:}
 						;
 
-putwStatement ::=		PUTW LPAREN expr RPAREN
+putwStatement ::=		PUTW LPAREN expr:e RPAREN
+								{:
+									cGenerator.printNumber(e);
+								:}
 						;
 
-putsStatement ::=		PUTS LPAREN expr RPAREN
+putsStatement ::=		PUTS LPAREN expr:e RPAREN
+								{:
+									cGenerator.printString(e);
+								:}
 						;
 
 lstSubProgram ::=		lstSubProgram subProgram
 						|/*epsilon*/
 						;
 
-subProgram ::=			ID LPAREN RPAREN LBRACE RBRACE
+subProgram ::=			ID:id
+								{:
+									if(tTable.getProcedure(id) == null){
+										tTable.addProcedure(id, sym.NULL);
+										cGenerator.generateLabel(id);
+									}else{
+										errorSubProgramDeclaration(id);
+									}
+								:}
+						LPAREN RPAREN LBRACE lstStatement returnStatement:e RBRACE
+								{:
+									if(e != null){
+										tTable.addProcedure(id, e.getType());
+									}
+								:}
 						;
+
+returnStatement ::=		RETURN expr:e SEMICOLON
+								{:
+									cGenerator.generateReturn(e);
+									RESULT = e;
+								:}
+						|/*epsilon*/
+						;
+
+subProgramCall ::=		ID:id LPAREN RPAREN
+								{:
+									Integer t = tTable.getProcedure(id);
+									if(t != null){
+										cGenerator.generateSubProgramCall(id);
+										RESULT = new Expression(0, t);
+									}else{
+										errorNoProcedure(id);
+									}
+								:}
+						;
+
+

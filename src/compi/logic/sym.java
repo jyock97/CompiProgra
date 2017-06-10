@@ -10,34 +10,37 @@ public class sym {
   /* terminals */
   public static final int TIMES = 4;
   public static final int AND = 12;
-  public static final int ELSE = 21;
+  public static final int ELSE = 20;
   public static final int SEMICOLON = 10;
   public static final int OR = 13;
   public static final int RBRACE = 9;
   public static final int RPAREN = 7;
-  public static final int WHILE = 20;
-  public static final int BOOLEAN_LITERAL = 30;
+  public static final int WHILE = 21;
+  public static final int BOOLEAN_LITERAL = 33;
+  public static final int RETURN = 26;
   public static final int GREATER = 16;
   public static final int IF = 19;
   public static final int LPAREN = 6;
   public static final int LBRACE = 8;
-  public static final int ID = 31;
-  public static final int STRING_LITERAL = 28;
-  public static final int BOOLEAN = 27;
-  public static final int STRING = 26;
+  public static final int ID = 34;
+  public static final int STRING_LITERAL = 31;
+  public static final int BOOLEAN = 30;
+  public static final int STRING = 29;
   public static final int EQUALS = 11;
+  public static final int SUB_PROGRAM = 25;
   public static final int EOF = 0;
   public static final int MAIN = 18;
-  public static final int BREAK = 24;
+  public static final int BREAK = 22;
   public static final int DIV = 5;
   public static final int ADD = 2;
-  public static final int PUTW = 22;
+  public static final int PUTW = 23;
   public static final int MINUS = 3;
   public static final int error = 1;
-  public static final int PUTS = 23;
+  public static final int PUTS = 24;
   public static final int ASSIGN = 17;
-  public static final int INTEGER_LITERAL = 29;
-  public static final int INTEGER = 25;
+  public static final int INTEGER_LITERAL = 32;
+  public static final int INTEGER = 28;
+  public static final int NULL = 27;
   public static final int LESS = 15;
   public static final int DIF = 14;
   public static final String[] terminalNames = new String[] {
@@ -61,11 +64,14 @@ public class sym {
   "ASSIGN",
   "MAIN",
   "IF",
-  "WHILE",
   "ELSE",
+  "WHILE",
+  "BREAK",
   "PUTW",
   "PUTS",
-  "BREAK",
+  "SUB_PROGRAM",
+  "RETURN",
+  "NULL",
   "INTEGER",
   "STRING",
   "BOOLEAN",

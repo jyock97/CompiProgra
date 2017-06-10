@@ -12,10 +12,9 @@ public class Symbol {
 		this.direction = direction;
 	}
 	
-	public Symbol(String id, int type, String value, int direction) {
+	public Symbol(String id, int type) {
 		this.id = id;
 		this.type = type;
-		this.direction = direction;
 	}
 	
 	public String getId(){

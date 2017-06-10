@@ -35,18 +35,19 @@ Id				= {Word}({Word}|{Digit})*
 <YYINITIAL> {
     {Whitespace}		{}
 
-    "main"				{ return symbol(sym.MAIN); }
+    "int"				{ return symbol(sym.INTEGER); }
+    "string"			{ return symbol(sym.STRING); }
+    "boolean"			{ return symbol(sym.BOOLEAN); }
+    "true"				{ return symbol(sym.BOOLEAN_LITERAL, new String(yytext())); }
+    "false"				{ return symbol(sym.BOOLEAN_LITERAL, new String(yytext())); }
     "if"				{ return symbol(sym.IF); }
     "else"				{ return symbol(sym.ELSE); }
     "while"				{ return symbol(sym.WHILE); }
     "break"				{ return symbol(sym.BREAK); }
-    "int"				{ return symbol(sym.INTEGER); }
-    "string"			{ return symbol(sym.STRING); }
-    "boolean"			{ return symbol(sym.BOOLEAN); }
+    "main"				{ return symbol(sym.MAIN); }
+    "return"			{ return symbol(sym.RETURN); }
     "puts"				{ return symbol(sym.PUTS); }
     "putw"				{ return symbol(sym.PUTW); }
-    "true"				{ return symbol(sym.BOOLEAN_LITERAL, new String(yytext())); }
-    "false"				{ return symbol(sym.BOOLEAN_LITERAL, new String(yytext())); }
 
     "+"					{ return symbol(sym.ADD); }
     "-"					{ return symbol(sym.MINUS); }
@@ -61,7 +62,7 @@ Id				= {Word}({Word}|{Digit})*
     "}"					{ return symbol(sym.RBRACE); }
     "<"					{ return symbol(sym.LESS); }
     ">"					{ return symbol(sym.GREATER); }
-    "¡="				{ return symbol(sym.DIF); }
+    "!="				{ return symbol(sym.DIF); }
     "||"				{ return symbol(sym.OR); }
     "&&"				{ return symbol(sym.AND); }
 
