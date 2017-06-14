@@ -2,6 +2,8 @@
 
 package compi.logic;
 import java_cup.runtime.*;
+import java.lang.StringBuilder;
+import compi.logic.datastructures.Token;
 
 
 /**
@@ -279,6 +281,7 @@ public class Lexer implements java_cup.runtime.Scanner {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
+    public  Token token =  Token.createToken();
     private Symbol symbol(int type) {
         return new Symbol(type, yyline, yycolumn);
     }
@@ -683,128 +686,159 @@ public class Lexer implements java_cup.runtime.Scanner {
             }
           case 35: break;
           case 3: 
-            { return symbol(sym.INTEGER_LITERAL, new String(yytext()));
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                    return symbol(sym.INTEGER_LITERAL, new String(yytext()));
             }
           case 36: break;
           case 4: 
             { //System.out.println("Es id");
+                                        token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
     						return symbol(sym.ID, new String(yytext()));
             }
           case 37: break;
           case 5: 
-            { return symbol(sym.ADD);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.ADD);
             }
           case 38: break;
           case 6: 
-            { return symbol(sym.MINUS);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n"); 
+                                            return symbol(sym.MINUS);
             }
           case 39: break;
           case 7: 
-            { return symbol(sym.TIMES);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.TIMES);
             }
           case 40: break;
           case 8: 
-            { return symbol(sym.DIV);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.DIV);
             }
           case 41: break;
           case 9: 
-            { return symbol(sym.LPAREN);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.LPAREN);
             }
           case 42: break;
           case 10: 
-            { return symbol(sym.RPAREN);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.RPAREN);
             }
           case 43: break;
           case 11: 
-            { return symbol(sym.SEMICOLON);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.SEMICOLON);
             }
           case 44: break;
           case 12: 
-            { return symbol(sym.ASSIGN);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.ASSIGN);
             }
           case 45: break;
           case 13: 
-            { return symbol(sym.LBRACE);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.LBRACE);
             }
           case 46: break;
           case 14: 
-            { return symbol(sym.RBRACE);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.RBRACE);
             }
           case 47: break;
           case 15: 
-            { return symbol(sym.LESS);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.LESS);
             }
           case 48: break;
           case 16: 
-            { return symbol(sym.GREATER);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.GREATER);
             }
           case 49: break;
           case 17: 
-            { return symbol(sym.STRING_LITERAL, new String(yytext()));
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                    return symbol(sym.STRING_LITERAL, new String(yytext()));
             }
           case 50: break;
           case 18: 
-            { return symbol(sym.IF);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.IF);
             }
           case 51: break;
           case 19: 
-            { return symbol(sym.EQUALS);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.EQUALS);
             }
           case 52: break;
           case 20: 
-            { return symbol(sym.DIF);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.DIF);
             }
           case 53: break;
           case 21: 
-            { return symbol(sym.OR);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.OR);
             }
           case 54: break;
           case 22: 
-            { return symbol(sym.AND);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.AND);
             }
           case 55: break;
           case 23: 
-            { return symbol(sym.INTEGER);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.INTEGER);
             }
           case 56: break;
           case 24: 
-            { return symbol(sym.BOOLEAN_LITERAL, new String(yytext()));
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                           return symbol(sym.BOOLEAN_LITERAL, new String(yytext()));
             }
           case 57: break;
           case 25: 
-            { return symbol(sym.ELSE);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.ELSE);
             }
           case 58: break;
           case 26: 
-            { return symbol(sym.MAIN);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.MAIN);
             }
           case 59: break;
           case 27: 
-            { return symbol(sym.PUTS);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.PUTS);
             }
           case 60: break;
           case 28: 
-            { return symbol(sym.PUTW);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.PUTW);
             }
           case 61: break;
           case 29: 
-            { return symbol(sym.BREAK);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.BREAK);
             }
           case 62: break;
           case 30: 
-            { return symbol(sym.WHILE);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.WHILE);
             }
           case 63: break;
           case 31: 
-            { return symbol(sym.STRING);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                    return symbol(sym.STRING);
             }
           case 64: break;
           case 32: 
-            { return symbol(sym.RETURN);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                            return symbol(sym.RETURN);
             }
           case 65: break;
           case 33: 
-            { return symbol(sym.BOOLEAN);
+            { token.sb.append("Token: " + yytext() + "\tColumna: " + yycolumn + "\tLinea: " + yyline + "\n");
+                                   return symbol(sym.BOOLEAN);
             }
           case 66: break;
           default:
