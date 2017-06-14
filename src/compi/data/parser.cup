@@ -2,6 +2,7 @@ package compi.logic;
 import java_cup.runtime.*;
 import compi.logic.datastructures.*;
 import compi.codegenerator.*;
+import java.util.Stack;
 
 action code {:
 
@@ -11,14 +12,15 @@ action code {:
 		whileContAux = 0,
 		subProgramCont = 0;
 	Stack ifStack = new Stack();
-	Stack ifWhile = new Stack();
+	Stack whileStack = new Stack();
 	StringBuilder semanticErrors;
 	TypeTable tTable;
 	CodeGenerator cGenerator;
 	FinalCodeGenerator fGenerator;
+        public  SemanticError sErrors =  SemanticError.createSemanticError();
 	
-	public String getSemanticErrrors(){
-		return semanticErrors.toString();
+	public void setSemanticErrrors(){
+		sErrors.sb = semanticErrors;
 	}
 	
 	private void generateFCode(){
@@ -164,6 +166,7 @@ program ::=						{:
 								//System.out.println(cGenerator.sBuilder);
 								System.out.println("\n");
 								validateIdsProcedures();
+                                                                setSemanticErrrors();
 								generateFCode();
 								:} 
 						;
@@ -293,7 +296,7 @@ expr ::=				condition:e
 						| ID:id
                                 {:
                                 	if(tTable.getSymbol(id) != null){
-	                                	RESULT = new Expression(tTable.getSymbol(id).getDirection(), sym.ID); 
+	                                	RESULT = new Expression(tTable.getSymbol(id).getDirection(), tTable.getSymbol(id).getType()); 
 									}else{
 										errorIdDeclarationNotExist(id);
 									}
@@ -357,7 +360,7 @@ ifStatement ::=			IF
 						LBRACE lstStatement RBRACE
 								{:
 									tTable.deleteScope();
-									cGenerator.generateBranch("EndIf#" + ifStack.top());
+									cGenerator.generateBranch("EndIf#" + ifStack.peek());
 								:}
 						elseStatement
 						;
@@ -365,18 +368,18 @@ ifStatement ::=			IF
 elseStatement ::=		ELSE
 								{:
 									tTable.createScope();
-									cGenerator.generateLabel("Else#" + ifStack.top());
+									cGenerator.generateLabel("Else#" + ifStack.peek());
 								:} 
 						LBRACE lstStatement RBRACE
 								{:
 									tTable.deleteScope();
-									cGenerator.generateLabel("EndIf#" + ifStack.top());
+									cGenerator.generateLabel("EndIf#" + ifStack.peek());
 									ifStack.pop();
 								:}
 						|/*epsilon*/
 								{:
-									cGenerator.generateLabel("Else#" + ifStack.top());
-									cGenerator.generateLabel("EndIf#" + ifStack.top());
+									cGenerator.generateLabel("Else#" + ifStack.peek());
+									cGenerator.generateLabel("EndIf#" + ifStack.peek());
 									ifStack.pop();
 								:}
 						;
@@ -385,17 +388,17 @@ whileStatement ::=		WHILE
 								{:
 									tTable.createScope();
 									whileStack.push(++whileCont);
-									cGenerator.generateLabel("InitWhile#" + whileStack.top());
+									cGenerator.generateLabel("InitWhile#" + whileStack.peek());
 								:}
 						LPAREN condition:e RPAREN
 								{:
-									cGenerator.generateBranchNotTrue("EndWhile#" + whileStack.top(), e);
+									cGenerator.generateBranchNotTrue("EndWhile#" + whileStack.peek(), e);
 								:}
 						LBRACE lstStatement RBRACE
 								{:
 									tTable.deleteScope();
-									cGenerator.generateLabel("InitWhile#" + whileStack.top());
-									whileStack.pop()
+									cGenerator.generateLabel("InitWhile#" + whileStack.peek());
+									whileStack.pop();
 								:}
 						;
 
@@ -435,6 +438,7 @@ lstSubProgram ::=		lstSubProgram subProgram
 
 subProgram ::=			ID:id
 								{:
+                                                                        tTable.createScope();
 									if(tTable.getProcedure(id) == null){
 										tTable.addProcedure(id, sym.NULL);
 										cGenerator.generateLabel(id);
@@ -447,6 +451,7 @@ subProgram ::=			ID:id
 									if(e != null){
 										tTable.addProcedure(id, e.getType());
 									}
+                                                                        tTable.deleteScope();
 								:}
 						;
 
