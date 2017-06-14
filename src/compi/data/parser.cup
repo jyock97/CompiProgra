@@ -1,16 +1,28 @@
 package compi.logic;
 import java_cup.runtime.*;
 import compi.logic.datastructures.*;
-import compi.codegenerator.CodeGenerator;
+import compi.codegenerator.*;
 
 action code {:
 
 	int ifCont = 0,
+		ifContAux = 0,
 		whileCont = 0,
+		whileContAux = 0,
 		subProgramCont = 0;
 	StringBuilder semanticErrors;
 	TypeTable tTable;
 	CodeGenerator cGenerator;
+	FinalCodeGenerator fGenerator;
+	
+	public String getSemanticErrrors(){
+		return semanticErrors.toString();
+	}
+	
+	private void generateFCode(){
+		fGenerator = new FinalCodeGenerator(cGenerator.sBuilder.toString());
+		fGenerator.generate();
+	}
 	
 	private void initDataStructures(){
 		semanticErrors = new StringBuilder(); 
@@ -150,6 +162,7 @@ program ::=						{:
 								//System.out.println(cGenerator.sBuilder);
 								System.out.println("\n");
 								validateIdsProcedures();
+								generateFCode();
 								:} 
 						;
 
@@ -336,7 +349,6 @@ ifStatement ::=			IF
 								:}
 						LPAREN condition:e RPAREN
 								{:
-									//cGenerator.generateCompare(e);
                                 	cGenerator.generateBranchNotTrue("Else#" + ++ifCont, e);
 								:}
 						LBRACE lstStatement RBRACE

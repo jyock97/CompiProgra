@@ -7,7 +7,7 @@ package compi.logic;
 
 import java_cup.runtime.*;
 import compi.logic.datastructures.*;
-import compi.codegenerator.CodeGenerator;
+import compi.codegenerator.*;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -371,11 +371,23 @@ class CUP$Parser$actions {
 
 
 	int ifCont = 0,
+		ifContAux = 0,
 		whileCont = 0,
+		whileContAux = 0,
 		subProgramCont = 0;
 	StringBuilder semanticErrors;
 	TypeTable tTable;
 	CodeGenerator cGenerator;
+	FinalCodeGenerator fGenerator;
+	
+	public String getSemanticErrrors(){
+		return semanticErrors.toString();
+	}
+	
+	private void generateFCode(){
+		fGenerator = new FinalCodeGenerator(cGenerator.sBuilder.toString());
+		fGenerator.generate();
+	}
 	
 	private void initDataStructures(){
 		semanticErrors = new StringBuilder(); 
@@ -498,6 +510,7 @@ class CUP$Parser$actions {
 								//System.out.println(cGenerator.sBuilder);
 								System.out.println("\n");
 								validateIdsProcedures();
+								generateFCode();
 								
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("program",0, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -1056,7 +1069,6 @@ class CUP$Parser$actions {
 		int eright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
 		Expression e = (Expression)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 
-									//cGenerator.generateCompare(e);
                                 	cGenerator.generateBranchNotTrue("Else#" + ++ifCont, e);
 								
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("NT$2",21, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);

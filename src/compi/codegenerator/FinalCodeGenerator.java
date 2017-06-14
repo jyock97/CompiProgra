@@ -16,131 +16,148 @@ import java.util.StringTokenizer;
  * @author josetri
  */
 public class FinalCodeGenerator {
-    BufferedReader br;           
-    String s;
-    
+	BufferedReader br;
+	String s;
 
-    //= br.readLine();   //dentro del while
-   
-    private StringBuilder sBuilder;
-    private String fCode, instruction, sA, sB, sC;
-    private StringTokenizer token;
-    
-    
-    private FinalCodeGenerator(String fCode) {
-        this.fCode = fCode;
-        br = new BufferedReader( new StringReader(fCode)); 
-    }
-    
-    
-    private void generated() throws IOException{
-        s = br.readLine();
-         while( s != null){
-             token = new StringTokenizer(s, "\t");
-             instruction = token.nextToken();
-             sA = token.nextToken("\t, #");
-             sB = token.nextToken(", #");
-             sC = token.nextToken(", #");
-             
-             
-             switch(instruction){
-		
-		case "LOAD_DIRECTION":
-			sBuilder.append("MOVE\t" + "/" + sA + ", /"+sC+"\n");
-			break;
-			
-		case "LOAD_INTEGER":
-			sBuilder.append("MOVE\t" + "#" + sA + ", /"+sC+"\n");
-			break;
-		
-		case "LOAD_STRING":
-                    int len = sA.length();
-                    int ic = Integer.parseInt(sC);
-                    for(int i = 0; i<len; i++){
-			sBuilder.append("MOVE\t" + "\'" + sA.charAt(i) + "\'"+", /"+ ic++);//A esto no le hace falta el cambio de linea?
-                    }
-                    sBuilder.append("MOVE\t" + "'\0'" + ", /"+ ic++);//A esto no le hace falta el cambio de linea?
-			break;
-		
-		case "CMP":
-			sBuilder.append("CMP\t" + "/" + sA + ", /"+sC+"\n");
-			break;
-                case "BNE":
-			sBuilder.append("BNE\t" + "$" + sC +"\n");
-			break;
-                case "BE":
-			sBuilder.append("BE\t" + "$" + sC +"\n");
-			break;
-                case "BN":
-			sBuilder.append("BN\t" + "$" + sC +"\n");
-			break;
-                case "BP":
-			sBuilder.append("BC\t" + "$" + sC +"\n");
-			break;
-                case "LABEL":
-			sBuilder.append("BE\t" + "$" + sC +"\n");
-			break;
-                case "BR":
-			sBuilder.append("BR\t" + "$" + sC +"\n");
-			break;
-                case "WR_STR":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
-			break;
-                case "WR_INT":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
-			break;
-                case "RETURN":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
-			break;
-                case "CALL":
-                        sBuilder.append("CALL\t" + "$" + sC +"\n");
-			break;
-                case "ADD":
-			sBuilder.append("ADD\t" + "/" + sA + ", /"+sB+"\n");
-                        sBuilder.append("MOVE\t" + ".A" + ", /"+sC+"\n");
-			break;
-                case "SUB":
-			sBuilder.append("SUB\t" + "/" + sA + ", /"+sB+"\n");
-                        sBuilder.append("MOVE\t" + ".A" + ", /"+sC+"\n");
-			break;
-                case "MUL":
-			sBuilder.append("MUL\t" + "/" + sA + ", /"+sB+"\n");
-                        sBuilder.append("MOVE\t" + ".A" + ", /"+sC+"\n");
-			break;
-                case "DIV":
-			sBuilder.append("DIV\t" + "/" + sA + ", /"+sB+"\n");
-                        sBuilder.append("MOVE\t" + ".A" + ", /"+sC+"\n");
-			break;
-                case "EQUALS":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
-			break;
-                case "LOGIC_AND":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
-			break;
-                case "LOGIC_OR":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
-			break;
-                case "DIF":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
-			break;
-      
+	// = br.readLine(); //dentro del while
+
+	private StringBuilder sBuilder;
+	private String fCode, instruction, sA, sB, sC;
+	private StringTokenizer token;
+
+	public FinalCodeGenerator(String fCode) {
+		this.fCode = fCode;
+		sBuilder = new StringBuilder();
+		br = new BufferedReader(new StringReader(fCode));
+	}
+
+	public void generate(){
+		try {
+			s = br.readLine();
+			System.out.println("\t\t" + s);
+		while (s != null) {
+			token = new StringTokenizer(s, "\t");
+			instruction = token.nextToken();
+			sA = token.nextToken("\t, #");
+			sB = token.nextToken(", #");
+			sC = token.nextToken(", #");
+
+			switch (instruction) {
+
+			case "LOAD_DIRECTION":
+				sBuilder.append("MOVE\t" + "/" + sA + ", /" + sC + "\n");
+				break;
+
+			case "LOAD_INTEGER":
+				sBuilder.append("MOVE\t" + "#" + sA + ", /" + sC + "\n");
+				break;
+
+			case "LOAD_STRING":
+				int len = sA.length();
+				int ic = Integer.parseInt(sC);
+				for (int i = 0; i < len; i++) {
+					sBuilder.append("MOVE\t" + "\'" + sA.charAt(i) + "\'" + ", /" + ic++ + "\n");
+				}
+				sBuilder.append("MOVE\t" + "'\0'" + ", /" + ic++ + "\n");
+				break;
+
+			case "CMP":
+				sBuilder.append("CMP\t" + "/" + sA + ", /" + sB + "\n");
+				break;
+			case "BNZ":
+				sBuilder.append("BNZ\t" + "$" + sC + "\n");
+				break;
+			case "BZ":
+				sBuilder.append("BZ\t" + "$" + sC + "\n");
+				break;
+			case "BN":
+				sBuilder.append("BN\t" + "$" + sC + "\n");
+				break;
+			case "BP":
+				sBuilder.append("BC\t" + "$" + sC + "\n");
+				break;
+			case "LABEL":
+				sBuilder.append("BE\t" + "$" + sC + "\n");
+				break;
+			case "BR":
+				sBuilder.append("BR\t" + "$" + sC + "\n");
+				break;
+			case "WR_STR":
+				sBuilder.append("WRSTR\t" + "/" + sC + "\n");
+				break;
+			case "WR_INT":
+				sBuilder.append("WRINT\t" + "/" + sC + "\n");
+				break;
+			case "RETURN":
+				sBuilder.append("MOV\t" + "/0, /" + sC + "\n");
+				break;
+			case "CALL":
+				sBuilder.append("CALL\t" + sA + "\n");//Falta agregar ret en gramatica y aqui
+				break;
+			case "ADD":
+				sBuilder.append("ADD\t" + "/" + sA + ", /" + sB + "\n");
+				sBuilder.append("MOVE\t" + ".A" + ", /" + sC + "\n");
+				break;
+			case "SUB":
+				sBuilder.append("SUB\t" + "/" + sA + ", /" + sB + "\n");
+				sBuilder.append("MOVE\t" + ".A" + ", /" + sC + "\n");
+				break;
+			case "MUL":
+				sBuilder.append("MUL\t" + "/" + sA + ", /" + sB + "\n");
+				sBuilder.append("MOVE\t" + ".A" + ", /" + sC + "\n");
+				break;
+			case "DIV":
+				sBuilder.append("DIV\t" + "/" + sA + ", /" + sB + "\n");
+				sBuilder.append("MOVE\t" + ".A" + ", /" + sC + "\n");
+				break;
+			case "EQUALS":
+				sBuilder.append("CMP\t,/" + sA + ", /" + sB + "\n");
+				sBuilder.append("BZ\t,$3\n");
+				sBuilder.append("MOV\t#" + 0 + ", /" + sC + "\n");
+				sBuilder.append("BR\t,$2\n");
+				sBuilder.append("MOV\t#" + 1 + ", /S" + sC + "\n");
+				break;
+			case "GREATER":
+				sBuilder.append("CMP\t,/" + sB + ", /" + sA + "\n");
+				sBuilder.append("BN\t,$3\n");
+				sBuilder.append("MOV\t#" + 0 + ", /" + sC + "\n");
+				sBuilder.append("BR\t,$2\n");
+				sBuilder.append("MOV\t#" + 1 + ", /" + sC + "\n");
+				break;
+			case "LESS":
+				sBuilder.append("CMP\t,/" + sA + ", /" + sB + "\n");
+				sBuilder.append("BN\t,$3\n");
+				sBuilder.append("MOV\t#" + 0 + ", /" + sC + "\n");
+				sBuilder.append("BR\t,$2\n");
+				sBuilder.append("MOV\t#" + 1 + ", /" + sC + "\n");
+				break;
+			case "LOGIC_AND":
+				sBuilder.append("AND\t/" + sA + ", /" + sB + "\n");
+				sBuilder.append("MOVE\t" + ".A" + ", /" + sC + "\n");
+				break;
+			case "LOGIC_OR":
+				sBuilder.append("OR\t/" + sA + ", /" + sB + "\n");
+				sBuilder.append("MOVE\t" + ".A" + ", /" + sC + "\n");
+				break;
+			case "DIF":
+				sBuilder.append("CMP\t,/" + sA + ",/" + sB + "\n");
+				sBuilder.append("BNZ\t,$3\n");
+				sBuilder.append("MOV\t#" + 0 + ",/" + sC + "\n");
+				sBuilder.append("BR\t,$2\n");
+				sBuilder.append("MOV\t#" + 1 + ",/S" + sC + "\n");
+				break;
+
+			}
+
+			s = br.readLine();
+			System.out.println("\t\t" + s);
 		}
-             
-             s = br.readLine();             
-             
-         }
-          BufferedWriter bw = new BufferedWriter(new FileWriter("archivo.txt"));
-          bw.write(sBuilder.toString());
-          bw.close();
-        
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
+		BufferedWriter bw = new BufferedWriter(new FileWriter("out.ens"));
+		bw.write(sBuilder.toString());
+		bw.close();
+		} catch (IOException e) {
+			System.out.println("Error manipulando 'out.ens'");
+		}
+	}
+
 }

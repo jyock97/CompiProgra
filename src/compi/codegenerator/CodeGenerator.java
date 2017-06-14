@@ -42,95 +42,76 @@ public class CodeGenerator {
 	
 	public void generateID(String id){
 		Symbol s = table.getSymbol(id);
-		System.out.print("DIRECTION \t\t" + id + ", null, #" + s.getDirection() + "\n");
-		sBuilder.append("DIRECTION \t\t" + id + ", null, #" + s.getDirection() + "\n");
+		//System.out.print("DIRECTION\t" + id + ",null,#" + s.getDirection() + "\n");
+		sBuilder.append("DIRECTION\t" + id + ",null,#" + s.getDirection() + "\n");
 	}
 	
 	public void generateID_EXPR(String id, Expression e){
 		//System.out.println("ASIGNAR \t " + id + " \t " + expr);
 		Symbol s = table.getSymbol(id);
-		System.out.print("LOAD_DIRECTION \t\t#" + e.getDirection() + ", null, #" + s.getDirection() + "\n");
-		sBuilder.append("LOAD_DIRECTION \t\t#" + e.getDirection() + ", null, #" + s.getDirection() + "\n");
+		System.out.print("LOAD_DIRECTION\t#" + e.getDirection() + ",null,#" + s.getDirection() + "\n");
+		sBuilder.append("LOAD_DIRECTION\t#" + e.getDirection() + ",null,#" + s.getDirection() + "\n");
 	}
 	
 	public void generateIntegerLiteral(String literal, Expression e){
-		System.out.print("LOAD_INTEGER \t\t" + literal + ", null, #" + e.getDirection() + "\n");
-		sBuilder.append("LOAD_INTEGER \t\t" + literal + ", null, #" + e.getDirection() + "\n");
+		System.out.print("LOAD_INTEGER\t" + literal + ",null,#" + e.getDirection() + "\n");
+		sBuilder.append("LOAD_INTEGER\t" + literal + ",null,#" + e.getDirection() + "\n");
 	}
 	
 	public void generateStringLiteral(String literal, Expression e){
-		System.out.print("LOAD_STRING \t\t" + literal + ", null, #" + e.getDirection() + "\n");
-		sBuilder.append("LOAD_STRING \t\t" + literal + ", null, #" + e.getDirection() + "\n");
+		System.out.print("LOAD_STRING\t" + literal + ",null,#" + e.getDirection() + "\n");
+		sBuilder.append("LOAD_STRING\t" + literal + ",null,#" + e.getDirection() + "\n");
 	}
 	
 	public void generateBooleanLiteral(String literal, Expression e){
-		System.out.print("LOAD_INTEGER \t\t" + 1 + ", null, #" + e.getDirection() + "\n");
+		System.out.print("LOAD_INTEGER\t" + 1 + ", null,#" + e.getDirection() + "\n");
 		if(literal.equals("true"))
-			sBuilder.append("LOAD_INTEGER \t\t" + 1 + ", null, #" + e.getDirection() + "\n");
+			sBuilder.append("LOAD_INTEGER\t" + 1 + ",null,#" + e.getDirection() + "\n");
 		
 		else
-			sBuilder.append("LOAD_INTEGER \t\t" + 0 + ", null, #" + e.getDirection() + "\n");
+			sBuilder.append("LOAD_INTEGER\t" + 0 + ",null,#" + e.getDirection() + "\n");
 	}
 	
 	public void generateCompare(Expression e){
-		System.out.print("CMP \t\t#" + e.getDirection() + ", 1, #" + e.getDirection() + "\n");
-		sBuilder.append("CMP \t\t#" + e.getDirection() + ", 1, #" + e.getDirection() + "\n");
+		System.out.print("CMP\t#" + e.getDirection() + ",1,null\n");
+		sBuilder.append("CMP\t#" + e.getDirection() + ",1,null\n");
 	}
 
 	public void generateBranchNotTrue(String label, Expression e) {
 		
-		switch(e.getType()){
-		
-		case sym.EQUALS:
-			System.out.print("BNE \t\t" + "null, null, " + label + "\n");
-			sBuilder.append("BNE \t\t" + "null, null, " + label + "\n");
-			break;
-			
-		case sym.DIF:
-			System.out.print("BE \t\t" + "null, null, " + label + "\n");
-			sBuilder.append("BE \t\t" + "null, null, " + label + "\n");
-			break;
-		
-		case sym.GREATER:
-			System.out.print("BN \t\t" + "null, null, " + label + "\n");
-			sBuilder.append("BN \t\t" + "null, null, " + label + "\n");
-			break;
-		
-		case sym.LESS:
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
-			sBuilder.append("BP \t\t" + "null, null, " + label + "\n");
-			break;
-		}
+		generateCompare(e);
+		System.out.print("BNZ\t" + "null,null," + label + "\n");
+		sBuilder.append("BNZ\t" + "null,null," + label + "\n");
 	}
 
 	public void generateLabel(String label) {
-		System.out.print("LABEL \t\t" + "null, null, " + label + "\n");
-		sBuilder.append("LABEL \t\t" + "null, null, " + label + "\n");
+		System.out.print("LABEL\t" + "null,null," + label + "\n");
+		sBuilder.append("LABEL\t" + "null,null," + label + "\n");
 	}
 
 	public void generateBranch(String label) {
-		System.out.print("BR \t\t" + "null, null, " + label + "\n");
-		sBuilder.append("BR \t\t" + "null, null, " + label + "\n");
+		System.out.print("BR\t" + "null,null, " + label + "\n");
+		sBuilder.append("BR\t" + "null,null, " + label + "\n");
 	}
 
 	public void printString(Expression e) {
-		System.out.print("WR_STR \t\t" + "null, null, #" + e.getDirection() + "\n");
-		sBuilder.append("WR_STR \t\t" + "null, null, #" + e.getDirection() + "\n");
+		System.out.print("WR_STR\t" + "null,null,#" + e.getDirection() + "\n");
+		sBuilder.append("WR_STR\t" + "null,null,#" + e.getDirection() + "\n");
 	}
 
 	public void printNumber(Expression e) {
-		System.out.print("WR_INT \t" + "null, null, #" + e.getDirection() + "\n");
-		sBuilder.append("WR_INT \t" + "null, null, #" + e.getDirection() + "\n");
+		System.out.print("WR_INT\t" + "null,null,#" + e.getDirection() + "\n");
+		sBuilder.append("WR_INT\t" + "null,null,#" + e.getDirection() + "\n");
 	}
 
 	public void generateReturn(Expression e) {
-		System.out.print("RETURN \t" + "null, null, #" + e.getDirection() + "\n");
-		sBuilder.append("RETURN \t" + "null, null, #" + e.getDirection() + "\n");
+		System.out.print("RETURN\t" + "null,null,#" + e.getDirection() + "\n");
+		sBuilder.append("RETURN\t" + "null,null,#" + e.getDirection() + "\n");
 	}
 
 	public void generateSubProgramCall(String id) {
-		System.out.print("CALL \t" + "null, null, " + id + "\n");
-		sBuilder.append("CALL \t" + "null, null, " + id + "\n");
+		System.out.print("CALL\t" + "null,null," + id + "\n");
+		sBuilder.append("CALL\t" + "null,null," + id + "\n");
 	}
 	
 	public void generateSubProgramId(String id) {
