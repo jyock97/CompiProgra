@@ -30,11 +30,11 @@ action code {:
 		semanticErrors.append("[ERROR]: El identificador <" + id + "> no se ha declarado. \n");
 	}
 	
-	private void errorTypeFormat(int type){
+	/*private void errorTypeFormat(int type){
 		//crear un string builder para poner todos los posibles errores
 		System.out.println("[ERROR]: <" + type + "> no es un formato valido para un entero.");
 		semanticErrors.append("[ERROR]: <" + type + "> no es un formato valido para un entero. \n");
-	}
+	}*/
 	
 	private void errorNoWhileForBreak(){
 		System.out.println("[ERROR]: Sentencia <break> fuera de un <while>");
@@ -42,8 +42,8 @@ action code {:
 	}
 	
 	private void errorSubProgramDeclaration(String id){
-		System.out.println("[ERROR]: No se puede declarar la variable <" + id + ">, ya existe un metoro <" + id + ">");
-		semanticErrors.append("[ERROR]: No se puede declarar la variable <" + id + ">, ya existe un metoro <" + id + "> \n");
+		System.out.println("[ERROR]: No se puede declarar la variable <" + id + ">, ya existe un procedimiento <" + id + ">");
+		semanticErrors.append("[ERROR]: No se puede declarar la variable <" + id + ">, ya existe un procedimiento <" + id + "> \n");
 	}
 	
 	private void errorIdDeclarationSubProgram(String id){
@@ -80,10 +80,20 @@ action code {:
 		System.out.println("[ERROR]: No existe el procedimiento <" + id + ">");
 		semanticErrors.append("[ERROR]: No existe el procedimiento <" + id + "> \n");
 	}
+	
+	private void errorPrintDiferentType(){
+		System.out.println("[ERROR]: No es posible imprimir ese tipo de dato");
+		semanticErrors.append("[ERROR]: No es posible imprimir ese tipo de dato\n");
+	}
+	
+	private void validateIdsProcedures(){
+		//validar si los ids que use, no existe ningun procedimiento
+		//validar si el metodo declarado retorna el mismo tipo que la variable
+	}
 :}
 
 parser code {:
-
+/*
   public void report_fatal_error(String message, Object info){
       //System.err.println("Can't recover from previous error(s), giving up.");
       System.err.println("Error tipo 1");
@@ -99,7 +109,7 @@ parser code {:
     
     public void unrecovered_syntax_error(Symbol cur_token){
     	System.out.println("Error tipo 4");
-    }
+    }*/
 :};
 
 terminal				ADD, MINUS;
@@ -139,6 +149,7 @@ program ::=						{:
 								{:
 								//System.out.println(cGenerator.sBuilder);
 								System.out.println("\n");
+								validateIdsProcedures();
 								:} 
 						;
 
@@ -381,15 +392,21 @@ breakStatement ::=		BREAK SEMICOLON
 								:}
 						;
 
-putwStatement ::=		PUTW LPAREN expr:e RPAREN
+putwStatement ::=		PUTW LPAREN expr:e RPAREN SEMICOLON
 								{:
-									cGenerator.printNumber(e);
+									if(e.getType() == sym.INTEGER)
+										cGenerator.printNumber(e);
+									else
+										errorPrintDiferentType();
 								:}
 						;
 
-putsStatement ::=		PUTS LPAREN expr:e RPAREN
+putsStatement ::=		PUTS LPAREN expr:e RPAREN SEMICOLON
 								{:
-									cGenerator.printString(e);
+									if(e.getType() == sym.STRING)
+										cGenerator.printString(e);
+									else
+										errorPrintDiferentType();
 								:}
 						;
 

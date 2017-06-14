@@ -113,6 +113,7 @@ public class Window extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) throws Exception {                                         
         // TODO add your handling code here:
         Parser p = new Parser(new Lexer(new StringReader(jTextArea1.getText())));
+        
         Object result = p.parse().value;
         
         
