@@ -10,6 +10,8 @@ action code {:
 		whileCont = 0,
 		whileContAux = 0,
 		subProgramCont = 0;
+	Stack ifStack = new Stack();
+	Stack ifWhile = new Stack();
 	StringBuilder semanticErrors;
 	TypeTable tTable;
 	CodeGenerator cGenerator;
@@ -346,6 +348,7 @@ condition ::=		expr:e1 EQUALS expr:e2
 ifStatement ::=			IF 
 								{:
 									tTable.createScope();
+									ifStack.push(++ifCont);
 								:}
 						LPAREN condition:e RPAREN
 								{:
@@ -354,7 +357,7 @@ ifStatement ::=			IF
 						LBRACE lstStatement RBRACE
 								{:
 									tTable.deleteScope();
-									cGenerator.generateBranch("EndIf#" + ifCont);
+									cGenerator.generateBranch("EndIf#" + ifStack.top());
 								:}
 						elseStatement
 						;
@@ -362,33 +365,37 @@ ifStatement ::=			IF
 elseStatement ::=		ELSE
 								{:
 									tTable.createScope();
-									cGenerator.generateLabel("Else#" + ifCont);
+									cGenerator.generateLabel("Else#" + ifStack.top());
 								:} 
 						LBRACE lstStatement RBRACE
 								{:
 									tTable.deleteScope();
-									cGenerator.generateLabel("EndIf#" + ifCont--);
+									cGenerator.generateLabel("EndIf#" + ifStack.top());
+									ifStack.pop();
 								:}
 						|/*epsilon*/
 								{:
-									cGenerator.generateLabel("Else#" + ifCont);
-									cGenerator.generateLabel("EndIf#" + ifCont--);
+									cGenerator.generateLabel("Else#" + ifStack.top());
+									cGenerator.generateLabel("EndIf#" + ifStack.top());
+									ifStack.pop();
 								:}
 						;
 
 whileStatement ::=		WHILE
 								{:
 									tTable.createScope();
-									cGenerator.generateLabel("InitWhile#" + ++whileCont);
+									whileStack.push(++whileCont);
+									cGenerator.generateLabel("InitWhile#" + whileStack.top());
 								:}
 						LPAREN condition:e RPAREN
 								{:
-									cGenerator.generateBranchNotTrue("EndWhile#" + whileCont, e);
+									cGenerator.generateBranchNotTrue("EndWhile#" + whileStack.top(), e);
 								:}
 						LBRACE lstStatement RBRACE
 								{:
 									tTable.deleteScope();
-									cGenerator.generateLabel("InitWhile#" + whileCont--);
+									cGenerator.generateLabel("InitWhile#" + whileStack.top());
+									whileStack.pop()
 								:}
 						;
 
