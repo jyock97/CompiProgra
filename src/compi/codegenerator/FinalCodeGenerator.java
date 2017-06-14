@@ -114,12 +114,6 @@ public class FinalCodeGenerator {
                 case "EQUALS":
 			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
-                case "GREATER":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//NO SE SI SE BOORA
-			break;
-                case "LESS":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");//NO SE SI SE BORRA
-			break;
                 case "LOGIC_AND":
 			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
