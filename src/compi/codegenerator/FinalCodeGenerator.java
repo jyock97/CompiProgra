@@ -50,80 +50,84 @@ public class FinalCodeGenerator {
 			break;
 			
 		case "LOAD_INTEGER":
-			System.out.print("BE \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("MOVE\t" + "#" + sA + ", /"+sC+"\n");
 			break;
 		
 		case "LOAD_STRING":
                     int len = sA.length();
                     int ic = Integer.parseInt(sC);
                     for(int i = 0; i<len; i++){
-			sBuilder.append("MOVE\t" + "\'" + sA.charAt(i) + "\'"+", /"+ ic++);
+			sBuilder.append("MOVE\t" + "\'" + sA.charAt(i) + "\'"+", /"+ ic++);//A esto no le hace falta el cambio de linea?
                     }
-                    sBuilder.append("MOVE\t" + "'\0'" + ", /"+ ic++);
+                    sBuilder.append("MOVE\t" + "'\0'" + ", /"+ ic++);//A esto no le hace falta el cambio de linea?
 			break;
 		
 		case "CMP":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("CMP\t" + "/" + sA + ", /"+sC+"\n");
 			break;
                 case "BNE":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("BNE\t" + "$" + sC +"\n");
 			break;
                 case "BE":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("BE\t" + "$" + sC +"\n");
 			break;
                 case "BN":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("BN\t" + "$" + sC +"\n");
 			break;
                 case "BP":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("BC\t" + "$" + sC +"\n");
 			break;
                 case "LABEL":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("BE\t" + "$" + sC +"\n");
 			break;
                 case "BR":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("BR\t" + "$" + sC +"\n");
 			break;
                 case "WR_STR":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
                 case "WR_INT":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
                 case "RETURN":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
                 case "CALL":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+                        sBuilder.append("CALL\t" + "$" + sC +"\n");
 			break;
                 case "ADD":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("ADD\t" + "/" + sA + ", /"+sB+"\n");
+                        sBuilder.append("MOVE\t" + ".A" + ", /"+sC+"\n");
 			break;
                 case "SUB":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("SUB\t" + "/" + sA + ", /"+sB+"\n");
+                        sBuilder.append("MOVE\t" + ".A" + ", /"+sC+"\n");
 			break;
                 case "MUL":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("MUL\t" + "/" + sA + ", /"+sB+"\n");
+                        sBuilder.append("MOVE\t" + ".A" + ", /"+sC+"\n");
 			break;
                 case "DIV":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			sBuilder.append("DIV\t" + "/" + sA + ", /"+sB+"\n");
+                        sBuilder.append("MOVE\t" + ".A" + ", /"+sC+"\n");
 			break;
                 case "EQUALS":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
                 case "GREATER":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//NO SE SI SE BOORA
 			break;
                 case "LESS":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//NO SE SI SE BORRA
 			break;
                 case "LOGIC_AND":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
                 case "LOGIC_OR":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
                 case "DIF":
-			System.out.print("BP \t\t" + "null, null, " + label + "\n");
+			System.out.print("BP \t\t" + "null, null, " + label + "\n");//FALTA
 			break;
       
 		}
