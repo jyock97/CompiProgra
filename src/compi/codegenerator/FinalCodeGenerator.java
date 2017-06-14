@@ -19,6 +19,7 @@ public class FinalCodeGenerator {
 	BufferedReader br;
 	String s;
 
+
 	// = br.readLine(); //dentro del while
 
 	private StringBuilder sBuilder;
@@ -34,6 +35,7 @@ public class FinalCodeGenerator {
 	public void generate(){
 		try {
 			s = br.readLine();
+                       
 			System.out.println("\t\t" + s);
 		while (s != null) {
 			token = new StringTokenizer(s, "\t");
@@ -77,7 +79,7 @@ public class FinalCodeGenerator {
 				sBuilder.append("BC\t" + "$" + sC + "\n");
 				break;
 			case "LABEL":
-				sBuilder.append("BE\t" + "$" + sC + "\n");
+				sBuilder.append(sC + ":\n");
 				break;
 			case "BR":
 				sBuilder.append("BR\t" + "$" + sC + "\n");
